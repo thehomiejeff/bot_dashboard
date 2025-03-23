@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Telegram Bot Monitoring{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">Dashboard Overview</h1>
+        <p class="text-muted">Real-time monitoring of your Telegram bots</p>
+    </div>
+</div>
+
+<!-- Primary Metrics Cards - Enhanced with 21st.dev inspired components -->
+<div id="metricsContainer">
+    <div class="empty-state-container" id="emptyDashboardState">
+        <div class="empty-state-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>
+        </div>
+        <h2 class="empty-state-title">No Bots Registered</h2>
+        <p class="empty-state-description">Start monitoring your Telegram bots by adding them to the dashboard or scanning for active bots.</p>
+        <div class="empty-state-action">
+            <a href="/bots" class="btn btn-onboarding">
+                <span class="btn-onboarding-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                </span>
+                Add a Bot
+            </a>
+            <button class="btn btn-onboarding btn-onboarding-secondary btn-pulse ms-2" id="scanBotsBtn">
+                <span class="btn-onboarding-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </span>
+                Scan for Bots
+            </button>
+        </div>
+    </div>
+    
+    <div class="bento-grid" id="metricsGrid" style="display: none;">
+        <div class="bento-item hover-card">
+            <div class="bento-item-content">
+                <div class="bento-item-header">
+                    <div class="bento-item-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>
+                    </div>
+                    <h3 class="bento-item-title">Total Bots</h3>
+                </div>
+                <div class="bento-item-body">
+                    <div class="metric-value" id="totalBotsCount">-</div>
+                    <div class="metric-label">Registered bots in the system</div>
+                </div>
+            </div>
+        </div>
+        <div class="bento-item hover-card">
+            <div class="bento-item-content">
+                <div class="bento-item-header">
+                    <div class="bento-item-icon" style="background-color: rgba(25, 135, 84, 0.1); color: var(--success);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
+                    <h3 class="bento-item-title">Active Bots</h3>
+                </div>
+                <div class="bento-item-body">
+                    <div class="metric-value" id="activeBotsCount">-</div>
+                    <div class="metric-label">Currently operational bots</div>
+                </div>
+            </div>
+        </div>
+        <div class="bento-item hover-card">
+            <div class="bento-item-content">
+                <div class="bento-item-header">
+                    <div class="bento-item-icon" style="background-color: rgba(220, 53, 69, 0.1); color: var(--danger);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+                    </div>
+                    <h3 class="bento-item-title">Bots with Errors</h3>
+                </div>
+                <div class="bento-item-body">
+                    <div class="metric-value" id="errorBotsCount">-</div>
+                    <div class="metric-label">Bots reporting errors</div>
+                </div>
+            </div>
+        </div>
+        <div class="bento-item hover-card">
+            <div class="bento-item-content">
+                <div class="bento-item-header">
+                    <div class="bento-item-icon" style="background-color: rgba(255, 193, 7, 0.1); color: var(--warning);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </div>
+                    <h3 class="bento-item-title">Queue Errors</h3>
+                </div>
+                <div class="bento-item-body">
+                    <div class="metric-value" id="totalErrorsCount">-</div>
+                    <div class="metric-label">Message queue errors</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resource Utilization - Enhanced with 21st.dev inspired components -->
+<div class="bento-grid" id="resourceUtilizationSection" style="display: none;">
+    <div class="bento-item hover-card">
+        <div class="bento-item-content">
+            <div class="bento-item-header">
+                <div class="bento-item-icon" style="background-color: rgba(13, 202, 240, 0.1);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+                </div>
+                <h3 class="bento-item-title">CPU Usage <span class="badge bg-info" id="avgCpuUsage">-</span></h3>
+            </div>
+            <div class="bento-item-body">
+                <div class="chart-container">
+                    <canvas id="cpuChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bento-item hover-card">
+        <div class="bento-item-content">
+            <div class="bento-item-header">
+                <div class="bento-item-icon" style="background-color: rgba(13, 202, 240, 0.1);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                </div>
+                <h3 class="bento-item-title">Memory Usage <span class="badge bg-info" id="avgMemoryUsage">-</span></h3>
+            </div>
+            <div class="bento-item-body">
+                <div class="chart-container">
+                    <canvas id="memoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bot Activity and Errors - Enhanced with 21st.dev inspired components -->
+<div class="bento-grid" id="botActivitySection" style="display: none;">
+    <div class="bento-item hover-card featured">
+        <div class="bento-item-content">
+            <div class="bento-item-header">
+                <div class="bento-item-icon" style="background-color: rgba(25, 135, 84, 0.1); color: var(--success);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                </div>
+                <h3 class="bento-item-title">Bot Activity <span class="sparkle-text">Live</span></h3>
+            </div>
+            <div class="bento-item-body">
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bento-item hover-card">
+        <div class="bento-item-content">
+            <div class="bento-item-header">
+                <div class="bento-item-icon" style="background-color: rgba(220, 53, 69, 0.1); color: var(--danger);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </div>
+                <h3 class="bento-item-title">Recent Errors</h3>
+            </div>
+            <div class="bento-item-body">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Bot</th>
+                                <th>Error</th>
+                                <th>Severity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentErrorsTable">
+                            <tr>
+                                <td colspan="3" class="text-center">
+                                    <div class="loading-pulse py-3">
+                                        <div class="d-flex justify-content-center">
+                                            <div class="spinner-border text-info" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                        <p class="mt-2 text-muted">Loading error data...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="bento-item-footer">
+                <a href="/logs" class="btn btn-sm btn-outline-danger">View All Logs</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Dashboard-specific JavaScript
+    function pageSpecificRefresh() {
+        loadDashboardSummary();
+        loadMetricsCharts();
+        loadRecentErrors();
+    }
+    
+    // Load dashboard summary data
+    function loadDashboardSummary() {
+        fetch('/api/dashboard/summary')
+            .then(response => response.json())
+            .then(data => {
+                // Check if we have any bots
+                if (data.total_bots > 0) {
+                    // Show metrics grid and hide empty state
+                    document.getElementById('metricsGrid').style.display = 'grid';
+                    document.getElementById('emptyDashboardState').style.display = 'none';
+                    
+                    // Update metrics
+                    document.getElementById('totalBotsCount').textContent = data.total_bots;
+                    document.getElementById('activeBotsCount').textContent = data.active_bots;
+                    document.getElementById('errorBotsCount').textContent = data.error_bots;
+                    document.getElementById('totalErrorsCount').textContent = data.total_errors;
+                    document.getElementById('avgCpuUsage').textContent = data.avg_cpu + '%';
+                    document.getElementById('avgMemoryUsage').textContent = data.avg_memory + '%';
+                    
+                    // Show charts and other sections
+                    document.getElementById('resourceUtilizationSection').style.display = 'block';
+                    document.getElementById('botActivitySection').style.display = 'block';
+                } else {
+                    // Hide metrics grid and show empty state
+                    document.getElementById('metricsGrid').style.display = 'none';
+                    document.getElementById('emptyDashboardState').style.display = 'flex';
+                    
+                    // Hide charts and other sections
+                    document.getElementById('resourceUtilizationSection').style.display = 'none';
+                    document.getElementById('botActivitySection').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading dashboard summary:', error);
+                // Show empty state on error
+                document.getElementById('metricsGrid').style.display = 'none';
+                document.getElementById('emptyDashboardState').style.display = 'flex';
+                document.getElementById('resourceUtilizationSection').style.display = 'none';
+                document.getElementById('botActivitySection').style.display = 'none';
+            });
+    }
+    
+    // Load metrics charts
+    function loadMetricsCharts() {
+        const url = selectedBotId === 'all' 
+            ? `/api/metrics?time_range=${selectedTimeRange}`
+            : `/api/metrics?bot_id=${selectedBotId}&time_range=${selectedTimeRange}`;
+            
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                // Process data for charts
+                const timestamps = [];
+                const cpuData = {};
+                const memoryData = {};
+                const messageData = {};
+                
+                // Group data by bot_id
+                data.forEach(metric => {
+                    const botId = metric.bot_id;
+                    const timestamp = new Date(metric.timestamp);
+                    
+                    // Add timestamp if not already in array
+                    const timeStr = timestamp.toLocaleTimeString();
+                    if (!timestamps.includes(timeStr)) {
+                        timestamps.push(timeStr);
+                    }
+                    
+                    // Initialize arrays if not exist
+                    if (!cpuData[botId]) cpuData[botId] = [];
+                    if (!memoryData[botId]) memoryData[botId] = [];
+                    if (!messageData[botId]) messageData[botId] = [];
+                    
+                    // Add data points
+                    cpuData[botId].push(metric.cpu_usage);
+                    memoryData[botId].push(metric.memory_usage);
+                    messageData[botId].push(metric.message_count);
+                });
+                
+                // Create CPU chart datasets
+                const cpuDatasets = Object.keys(cpuData).map(botId => {
+                    const color = getRandomColor(0.7, botId);
+                    const botName = botsData.find(bot => bot.id == botId)?.name || `Bot #${botId}`;
+                    
+                    return {
+                        label: botName,
+                        data: cpuData[botId],
+                        borderColor: color,
+                        backgroundColor: color.replace('0.7', '0.1'),
+                        borderWidth: 2,
+                        tension: 0.3
+                    };
+                });
+                
+                // Create Memory chart datasets
+                const memoryDatasets = Object.keys(memoryData).map(botId => {
+                    const color = getRandomColor(0.7, botId);
+                    const botName = botsData.find(bot => bot.id == botId)?.name || `Bot #${botId}`;
+                    
+                    return {
+                        label: botName,
+                        data: memoryData[botId],
+                        borderColor: color,
+                        backgroundColor: color.replace('0.7', '0.1'),
+                        borderWidth: 2,
+                        tension: 0.3
+                    };
+                });
+                
+                // Create Activity chart datasets
+                const messageDatasets = Object.keys(messageData).map(botId => {
+                    const color = getRandomColor(0.7, botId);
+                    const botName = botsData.find(bot => bot.id == botId)?.name || `Bot #${botId}`;
+                    
+                    return {
+                        label: botName,
+                        data: messageData[botId],
+                        borderColor: color,
+                        backgroundColor: color.replace('0.7', '0.1'),
+                        borderWidth: 2,
+                        tension: 0.3
+                    };
+                });
+                
+                // Create or update charts
+                createOrUpdateChart('cpuChart', 'line', timestamps, cpuDatasets, {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'CPU Usage (%)',
+                            color: 'var(--text-primary)'
+                        }
+                    }
+                });
+                
+                createOrUpdateChart('memoryChart', 'line', timestamps, memoryDatasets, {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Memory Usage (%)',
+                            color: 'var(--text-primary)'
+                        }
+                    }
+                });
+                
+                createOrUpdateChart('activityChart', 'line', timestamps, messageDatasets, {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Message Activity',
+                            color: 'var(--text-primary)'
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading metrics data:', error));
+    }
+    
+    // Load recent errors
+    function loadRecentErrors() {
+        const url = selectedBotId === 'all' 
+            ? '/api/errors'
+            : `/api/errors?bot_id=${selectedBotId}`;
+            
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('recentErrorsTable');
+                
+                if (data.length === 0) {
+                    tableBody.innerHTML = createTableEmptyState(
+                        'error', 
+                        'No Errors Found', 
+                        'Your bots are running smoothly with no reported errors.',
+                        3
+                    );
+                    return;
+                }
+                
+                // Display only the 5 most recent errors
+                const recentErrors = data.slice(0, 5);
+                
+                tableBody.innerHTML = recentErrors.map(error => {
+                    const botName = botsData.find(bot => bot.id === error.bot_id)?.name || `Bot #${error.bot_id}`;
+                    
+                    return `
+                        <tr>
+                            <td>${botName}</td>
+                            <td>${error.error_type}</td>
+                            <td>${formatSeverity(error.severity)}</td>
+                        </tr>
+                    `;
+                }).join('');
+            })
+            .catch(error => console.error('Error loading recent errors:', error));
+    }
+    
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        pageSpecificRefresh();
+    });
+</script>
+{% endblock %}

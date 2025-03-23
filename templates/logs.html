@@ -1,0 +1,437 @@
+{% extends 'base.html' %}
+
+{% block title %}Logs - Telegram Bot Monitoring{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="h3 mb-0">Log Explorer</h1>
+        <p class="text-muted">Search and analyze bot logs and errors</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <button class="btn btn-outline-info" id="exportLogsBtn">
+            <i class="bi bi-download"></i> Export Logs
+        </button>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                Filters
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Bot</label>
+                        <select class="form-select bg-dark text-light" id="logBotFilter">
+                            <option value="all" selected>All Bots</option>
+                            <!-- Bot options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Severity</label>
+                        <select class="form-select bg-dark text-light" id="logSeverityFilter">
+                            <option value="all" selected>All Severities</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Error Type</label>
+                        <select class="form-select bg-dark text-light" id="logTypeFilter">
+                            <option value="all" selected>All Types</option>
+                            <option value="API Error">API Error</option>
+                            <option value="Timeout">Timeout</option>
+                            <option value="Authentication Failed">Authentication Failed</option>
+                            <option value="Rate Limit Exceeded">Rate Limit Exceeded</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Time Period</label>
+                        <select class="form-select bg-dark text-light" id="logTimeFilter">
+                            <option value="1h">Last Hour</option>
+                            <option value="6h">Last 6 Hours</option>
+                            <option value="24h" selected>Last 24 Hours</option>
+                            <option value="7d">Last 7 Days</option>
+                            <option value="30d">Last 30 Days</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-9 mb-3">
+                        <label class="form-label">Search</label>
+                        <input type="text" class="form-control bg-dark text-light" id="logSearchInput" placeholder="Search in error messages...">
+                    </div>
+                    <div class="col-md-3 mb-3 d-flex align-items-end">
+                        <button class="btn btn-info w-100" id="applyLogFilters">Apply Filters</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Distribution Chart -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                Error Distribution
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="errorDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Logs Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Error Logs</span>
+                <span class="badge bg-info" id="totalLogsCount">0 logs</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Bot</th>
+                                <th>Error Type</th>
+                                <th>Message</th>
+                                <th>Severity</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTable">
+                            <tr>
+                                <td colspan="5" class="text-center">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <nav aria-label="Logs pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item disabled">
+                            <a class="page-link bg-dark text-light border-secondary" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link bg-info border-info" href="#">1</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link bg-dark text-light border-secondary" href="#">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link bg-dark text-light border-secondary" href="#">3</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link bg-dark text-light border-secondary" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Detail Modal -->
+<div class="modal fade" id="logDetailModal" tabindex="-1" aria-labelledby="logDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logDetailModalLabel">Error Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>Bot:</strong> <span id="detailBotName"></span></p>
+                        <p><strong>Error Type:</strong> <span id="detailErrorType"></span></p>
+                        <p><strong>Severity:</strong> <span id="detailSeverity"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Timestamp:</strong> <span id="detailTimestamp"></span></p>
+                        <p><strong>Error ID:</strong> <span id="detailErrorId"></span></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <h6>Error Message</h6>
+                        <div class="p-3 bg-secondary bg-opacity-25 rounded">
+                            <pre class="mb-0 text-light" id="detailErrorMessage"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Logs explorer specific JavaScript
+    let currentPage = 1;
+    const logsPerPage = 10;
+    let filteredLogs = [];
+    
+    function pageSpecificRefresh() {
+        loadBotOptions();
+        loadLogs();
+    }
+    
+    // Load bot options for filter
+    function loadBotOptions() {
+        const botFilter = document.getElementById('logBotFilter');
+        
+        // Clear existing options except "All Bots"
+        while (botFilter.options.length > 1) {
+            botFilter.remove(1);
+        }
+        
+        // Add bot options
+        botsData.forEach(bot => {
+            const option = document.createElement('option');
+            option.value = bot.id;
+            option.textContent = bot.name;
+            botFilter.appendChild(option);
+        });
+    }
+    
+    // Load logs based on filters
+    function loadLogs() {
+        const botId = document.getElementById('logBotFilter').value;
+        const severity = document.getElementById('logSeverityFilter').value;
+        const errorType = document.getElementById('logTypeFilter').value;
+        const timeRange = document.getElementById('logTimeFilter').value;
+        const searchText = document.getElementById('logSearchInput').value.toLowerCase();
+        
+        // Build API URL with filters
+        let url = '/api/errors';
+        const params = [];
+        
+        if (botId !== 'all') {
+            params.push(`bot_id=${botId}`);
+        }
+        
+        if (severity !== 'all') {
+            params.push(`severity=${severity}`);
+        }
+        
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                // Apply client-side filters
+                filteredLogs = data.filter(log => {
+                    // Filter by error type
+                    if (errorType !== 'all' && log.error_type !== errorType) {
+                        return false;
+                    }
+                    
+                    // Filter by search text
+                    if (searchText && !log.error_message.toLowerCase().includes(searchText)) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
+                // Update total count
+                document.getElementById('totalLogsCount').textContent = `${filteredLogs.length} logs`;
+                
+                // Display current page
+                displayLogsPage(currentPage);
+                
+                // Create error distribution chart
+                createErrorDistributionChart(data);
+            })
+            .catch(error => console.error('Error loading logs:', error));
+    }
+    
+    // Display logs for the current page
+    function displayLogsPage(page) {
+        const tableBody = document.getElementById('logsTable');
+        const startIndex = (page - 1) * logsPerPage;
+        const endIndex = startIndex + logsPerPage;
+        const pageData = filteredLogs.slice(startIndex, endIndex);
+        
+        if (pageData.length === 0) {
+            tableBody.innerHTML = createTableEmptyState(
+                'data', 
+                'No Logs Found', 
+                'There are no logs matching your current filter criteria. Try adjusting your filters or check back later.',
+                5
+            );
+            return;
+        }
+        
+        tableBody.innerHTML = pageData.map(log => {
+            const botName = botsData.find(bot => bot.id === log.bot_id)?.name || `Bot #${log.bot_id}`;
+            
+            return `
+                <tr data-log-id="${log.id}" class="log-row">
+                    <td>${botName}</td>
+                    <td>${log.error_type}</td>
+                    <td>${log.error_message.substring(0, 50)}${log.error_message.length > 50 ? '...' : ''}</td>
+                    <td>${formatSeverity(log.severity)}</td>
+                    <td>${formatTimestamp(log.timestamp)}</td>
+                </tr>
+            `;
+        }).join('');
+        
+        // Add click event to show details
+        document.querySelectorAll('.log-row').forEach(row => {
+            row.addEventListener('click', function() {
+                const logId = this.getAttribute('data-log-id');
+                showLogDetails(logId);
+            });
+        });
+        
+        // Update pagination
+        updatePagination(page);
+    }
+    
+    // Update pagination controls
+    function updatePagination(currentPage) {
+        const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
+        const pagination = document.querySelector('.pagination');
+        
+        // Clear existing page items except first and last
+        while (pagination.children.length > 2) {
+            pagination.removeChild(pagination.children[1]);
+        }
+        
+        // Previous button
+        const prevButton = pagination.children[0];
+        if (currentPage === 1) {
+            prevButton.classList.add('disabled');
+        } else {
+            prevButton.classList.remove('disabled');
+            prevButton.querySelector('a').addEventListener('click', function(e) {
+                e.preventDefault();
+                displayLogsPage(currentPage - 1);
+            });
+        }
+        
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            const pageItem = document.createElement('li');
+            pageItem.className = `page-item${i === currentPage ? ' active' : ''}`;
+            
+            const pageLink = document.createElement('a');
+            pageLink.className = `page-link${i === currentPage ? ' bg-info border-info' : ' bg-dark text-light border-secondary'}`;
+            pageLink.href = '#';
+            pageLink.textContent = i;
+            
+            pageLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                displayLogsPage(i);
+            });
+            
+            pageItem.appendChild(pageLink);
+            pagination.insertBefore(pageItem, pagination.lastElementChild);
+        }
+        
+        // Next button
+        const nextButton = pagination.lastElementChild;
+        if (currentPage === totalPages || totalPages === 0) {
+            nextButton.classList.add('disabled');
+        } else {
+            nextButton.classList.remove('disabled');
+            nextButton.querySelector('a').addEventListener('click', function(e) {
+                e.preventDefault();
+                displayLogsPage(currentPage + 1);
+            });
+        }
+    }
+    
+    // Show log details in modal
+    function showLogDetails(logId) {
+        const log = filteredLogs.find(l => l.id == logId);
+        if (!log) return;
+        
+        const botName = botsData.find(bot => bot.id === log.bot_id)?.name || `Bot #${log.bot_id}`;
+        
+        document.getElementById('detailBotName').textContent = botName;
+        document.getElementById('detailErrorType').textContent = log.error_type;
+        document.getElementById('detailSeverity').innerHTML = formatSeverity(log.severity);
+        document.getElementById('detailTimestamp').textContent = formatTimestamp(log.timestamp);
+        document.getElementById('detailErrorId').textContent = log.id;
+        document.getElementById('detailErrorMessage').textContent = log.error_message;
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('logDetailModal'));
+        modal.show();
+    }
+    
+    // Create error distribution chart
+    function createErrorDistributionChart(logs) {
+        // Group errors by type
+        const errorTypes = {};
+        logs.forEach(log => {
+            if (!errorTypes[log.error_type]) {
+                errorTypes[log.error_type] = 0;
+            }
+            errorTypes[log.error_type]++;
+        });
+        
+        // Prepare chart data
+        const labels = Object.keys(errorTypes);
+        const data = Object.values(errorTypes);
+        const backgroundColors = labels.map((_, index) => getRandomColor(0.7));
+        
+        // Create chart
+        createOrUpdateChart('errorDistributionChart', 'bar', labels, [
+            {
+                label: 'Error Count',
+                data: data,
+                backgroundColor: backgroundColors
+            }
+        ], {
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Error Distribution by Type',
+                    color: 'var(--text-primary)'
+                }
+            }
+        });
+    }
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply filters button
+        document.getElementById('applyLogFilters').addEventListener('click', function() {
+            currentPage = 1;
+            loadLogs();
+        });
+        
+        // Export logs button
+        document.getElementById('exportLogsBtn').addEventListener('click', function() {
+            // In a real application, this would generate a CSV or JSON file
+            alert('Log export functionality would be implemented in a production environment');
+        });
+        
+        // Initial load
+        pageSpecificRefresh();
+    });
+</script>
+{% endblock %}

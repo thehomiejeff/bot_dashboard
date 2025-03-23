@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+
+{% block title %}Alerts - Telegram Bot Monitoring{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="h3 mb-0">Alert Management</h1>
+        <p class="text-muted">Configure and manage bot monitoring alerts</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#addAlertModal">
+            <i class="bi bi-plus-circle"></i> Create Alert
+        </button>
+    </div>
+</div>
+
+<!-- Active Alerts -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Active Alerts</span>
+                <span class="badge bg-danger" id="activeAlertsCount">0</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Bot</th>
+                                <th>Alert Type</th>
+                                <th>Severity</th>
+                                <th>Triggered At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activeAlertsTable">
+                            <tr>
+                                <td colspan="5" class="text-center">No active alerts</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Rules -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                Alert Rules
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Bot</th>
+                                <th>Condition</th>
+                                <th>Threshold</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alertRulesTable">
+                            <tr>
+                                <td>High CPU Usage</td>
+                                <td>All Bots</td>
+                                <td>CPU Usage</td>
+                                <td>> 80%</td>
+                                <td>High</td>
+                                <td><span class="status-active">Enabled</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                                    <button class="btn btn-sm btn-outline-danger">Disable</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Memory Leak</td>
+                                <td>All Bots</td>
+                                <td>Memory Usage</td>
+                                <td>> 90%</td>
+                                <td>Critical</td>
+                                <td><span class="status-active">Enabled</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                                    <button class="btn btn-sm btn-outline-danger">Disable</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Slow Response</td>
+                                <td>All Bots</td>
+                                <td>Response Time</td>
+                                <td>> 2s</td>
+                                <td>Medium</td>
+                                <td><span class="status-active">Enabled</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                                    <button class="btn btn-sm btn-outline-danger">Disable</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>API Rate Limit</td>
+                                <td>All Bots</td>
+                                <td>Error Type</td>
+                                <td>Rate Limit Exceeded</td>
+                                <td>High</td>
+                                <td><span class="status-inactive">Disabled</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                                    <button class="btn btn-sm btn-outline-success">Enable</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alert History -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                Alert History
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="alertHistoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                Notification Settings
+            </div>
+            <div class="card-body">
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                    <label class="form-check-label" for="emailNotifications">Email Notifications</label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email Recipients</label>
+                    <input type="text" class="form-control bg-dark text-light" value="admin@example.com">
+                </div>
+                
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="telegramNotifications" checked>
+                    <label class="form-check-label" for="telegramNotifications">Telegram Notifications</label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Telegram Chat ID</label>
+                    <input type="text" class="form-control bg-dark text-light" value="123456789">
+                </div>
+                
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="webhookNotifications">
+                    <label class="form-check-label" for="webhookNotifications">Webhook Notifications</label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Webhook URL</label>
+                    <input type="text" class="form-control bg-dark text-light" placeholder="https://example.com/webhook">
+                </div>
+                
+                <button class="btn btn-info">Save Settings</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Alert Modal -->
+<div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAlertModalLabel">Create New Alert Rule</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAlertForm">
+                    <div class="mb-3">
+                        <label for="alertName" class="form-label">Alert Name</label>
+                        <input type="text" class="form-control bg-dark text-light" id="alertName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="alertBot" class="form-label">Bot</label>
+                        <select class="form-select bg-dark text-light" id="alertBot">
+                            <option value="all" selected>All Bots</option>
+                            <!-- Bot options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="alertCondition" class="form-label">Condition</label>
+                        <select class="form-select bg-dark text-light" id="alertCondition" required>
+                            <option value="cpu_usage">CPU Usage</option>
+                            <option value="memory_usage">Memory Usage</option>
+                            <option value="response_time">Response Time</option>
+                            <option value="error_count">Error Count</option>
+                            <option value="error_type">Error Type</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="alertOperator" class="form-label">Operator</label>
+                        <select class="form-select bg-dark text-light" id="alertOperator" required>
+                            <option value="gt">Greater Than (>)</option>
+                            <option value="lt">Less Than (<)</option>
+                            <option value="eq">Equal To (=)</option>
+                            <option value="contains">Contains</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="alertThreshold" class="form-label">Threshold</label>
+                        <input type="text" class="form-control bg-dark text-light" id="alertThreshold" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="alertSeverity" class="form-label">Severity</label>
+                        <select class="form-select bg-dark text-light" id="alertSeverity" required>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-info" id="createAlertButton">Create Alert</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Alert management specific JavaScript
+    function pageSpecificRefresh() {
+        loadActiveAlerts();
+        loadAlertHistory();
+        populateBotSelector();
+    }
+    
+    // Load active alerts
+    function loadActiveAlerts() {
+        // In a real application, this would fetch from an API
+        // For demo purposes, we'll simulate some active alerts
+        const activeAlerts = [
+            {
+                id: 1,
+                bot_id: 1,
+                alert_type: 'High CPU Usage',
+                severity: 'high',
+                triggered_at: new Date().toISOString()
+            },
+            {
+                id: 2,
+                bot_id: 4,
+                alert_type: 'Memory Leak',
+                severity: 'critical',
+                triggered_at: new Date(Date.now() - 30 * 60000).toISOString() // 30 minutes ago
+            }
+        ];
+        
+        document.getElementById('activeAlertsCount').textContent = activeAlerts.length;
+        
+        const tableBody = document.getElementById('activeAlertsTable');
+        
+        if (activeAlerts.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No active alerts</td></tr>';
+            return;
+        }
+        
+        tableBody.innerHTML = activeAlerts.map(alert => {
+            const botName = botsData.find(bot => bot.id === alert.bot_id)?.name || `Bot #${alert.bot_id}`;
+            
+            return `
+                <tr>
+                    <td>${botName}</td>
+                    <td>${alert.alert_type}</td>
+                    <td>${formatSeverity(alert.severity)}</td>
+                    <td>${formatTimestamp(alert.triggered_at)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-info">View</button>
+                        <button class="btn btn-sm btn-outline-success">Resolve</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+    
+    // Load alert history chart
+    function loadAlertHistory() {
+        // In a real application, this would fetch from an API
+        // For demo purposes, we'll create simulated data
+        
+        // Last 7 days
+        const days = [];
+        const alertCounts = {
+            low: [],
+            medium: [],
+            high: [],
+            critical: []
+        };
+        
+        const today = new Date();
+        
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - i);
+            days.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+            
+            // Random counts for each severity
+            alertCounts.low.push(Math.floor(Math.random() * 5));
+            alertCounts.medium.push(Math.floor(Math.random() * 4));
+            alertCounts.high.push(Math.floor(Math.random() * 3));
+            alertCounts.critical.push(Math.floor(Math.random() * 2));
+        }
+        
+        // Create chart
+        createOrUpdateChart('alertHistoryChart', 'bar', days, [
+            {
+                label: 'Low',
+                data: alertCounts.low,
+                backgroundColor: 'rgba(13, 202, 240, 0.7)'
+            },
+            {
+                label: 'Medium',
+                data: alertCounts.medium,
+                backgroundColor: 'rgba(255, 193, 7, 0.7)'
+            },
+            {
+                label: 'High',
+                data: alertCounts.high,
+                backgroundColor: 'rgba(220, 53, 69, 0.7)'
+            },
+            {
+                label: 'Critical',
+                data: alertCounts.critical,
+                backgroundColor: 'rgba(108, 17, 17, 0.7)'
+            }
+        ], {
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Alert History (Last 7 Days)',
+                    color: 'var(--text-primary)'
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true
+                },
+                y: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Alerts',
+                        color: 'var(--text-secondary)'
+                    }
+                }
+            }
+        });
+    }
+    
+    // Populate bot selector in add alert modal
+    function populateBotSelector() {
+        const botSelector = document.getElementById('alertBot');
+        
+        // Clear existing options except "All Bots"
+        while (botSelector.options.length > 1) {
+            botSelector.remove(1);
+        }
+        
+        // Add bot options
+        botsData.forEach(bot => {
+            const option = document.createElement('option');
+            option.value = bot.id;
+            option.textContent = bot.name;
+            botSelector.appendChild(option);
+        });
+    }
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create alert button
+        document.getElementById('createAlertButton').addEventListener('click', function() {
+            const name = document.getElementById('alertName').value;
+            const condition = document.getElementById('alertCondition').value;
+            const threshold = document.getElementById('alertThreshold').value;
+            
+            if (!name || !threshold) {
+                alert('Alert name and threshold are required');
+                return;
+            }
+            
+            // In a real application, this would make an API call to create the alert
+            alert('Alert creation would be implemented in a production environment');
+            
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
+            modal.hide();
+            
+            // Clear the form
+            document.getElementById('addAlertForm').reset();
+        });
+        
+        // Add event listeners to alert rule action buttons
+        document.querySelectorAll('#alertRulesTable button').forEach(button => {
+            button.addEventListener('click', function() {
+                // In a real application, this would make API calls to edit/enable/disable rules
+                alert('Alert rule management would be implemented in a production environment');
+            });
+        });
+        
+        // Add event listeners to active alert action buttons
+        document.getElementById('activeAlertsTable').addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                // In a real application, this would make API calls to view/resolve alerts
+                alert('Alert management would be implemented in a production environment');
+            }
+        });
+        
+        // Save notification settings button
+        document.querySelector('.card-body .btn-info').addEventListener('click', function() {
+            // In a real application, this would make an API call to save settings
+            alert('Notification settings would be saved in a production environment');
+        });
+        
+        // Initial load
+        pageSpecificRefresh();
+    });
+</script>
+{% endblock %}

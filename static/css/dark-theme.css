@@ -1,0 +1,180 @@
+/* Dark Theme CSS for Telegram Bot Monitoring Dashboard */
+
+:root {
+  --primary-bg: #121212;
+  --secondary-bg: #1e1e1e;
+  --card-bg: #252525;
+  --border-color: #333;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --header-text: #ffffff;
+  --accent-blue: #0d6efd;
+  --accent-teal: #20c997;
+  --accent-cyan: #0dcaf0;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --success: #198754;
+  --info: #0dcaf0;
+}
+
+body {
+  background-color: var(--primary-bg);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+  background-color: var(--secondary-bg) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  color: var(--header-text);
+}
+
+.bento-item-title, h1, h2, h3, h4, h5, h6 {
+  color: var(--header-text);
+  font-weight: 600;
+}
+
+.metric-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.metric-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.metric-label {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.table {
+  color: var(--text-primary);
+}
+
+.table thead th {
+  border-bottom: 2px solid var(--border-color);
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.table td, .table th {
+  border-color: var(--border-color);
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Status indicators */
+.status-active {
+  color: var(--success);
+}
+
+.status-inactive {
+  color: var(--text-secondary);
+}
+
+.status-error {
+  color: var(--danger);
+}
+
+/* Severity indicators */
+.severity-low {
+  color: var(--info);
+}
+
+.severity-medium {
+  color: var(--warning);
+}
+
+.severity-high {
+  color: var(--danger);
+}
+
+.severity-critical {
+  color: var(--danger);
+  font-weight: bold;
+}
+
+/* Form controls */
+.form-control, .form-select {
+  background-color: var(--secondary-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: var(--secondary-bg);
+  border-color: var(--accent-blue);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Buttons */
+.btn-outline-secondary {
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Charts */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .metric-value {
+    font-size: 2rem;
+  }
+  
+  .chart-container {
+    height: 200px;
+  }
+}

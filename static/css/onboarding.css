@@ -1,0 +1,97 @@
+/* Empty State Components */
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  border: 1px dashed var(--border-color);
+  margin: 1.5rem 0;
+}
+
+.empty-state-icon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--header-text);
+}
+
+.empty-state-description {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 500px;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state-action {
+  margin-top: 1rem;
+}
+
+/* Onboarding Button Styles */
+.btn-onboarding {
+  background-color: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-onboarding:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  background-color: #0b5ed7;
+  color: white;
+}
+
+.btn-onboarding-secondary {
+  background-color: transparent;
+  color: var(--accent-blue);
+  border: 2px solid var(--accent-blue);
+}
+
+.btn-onboarding-secondary:hover {
+  background-color: rgba(13, 110, 253, 0.1);
+  color: var(--accent-blue);
+}
+
+.btn-onboarding-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+/* Pulse animation for scan button */
+@keyframes pulse-border {
+  0% {
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+  }
+}
+
+.btn-pulse {
+  animation: pulse-border 2s infinite;
+}

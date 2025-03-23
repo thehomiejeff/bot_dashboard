@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Telegram Bot Monitoring Dashboard{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    
+    <!-- macOS Theme CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/macos-theme.css') }}">
+    
+    <!-- macOS Enhanced Components CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/macos-enhanced-components.css') }}">
+    
+    <!-- Additional CSS -->
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <span class="sparkle-text">Telegram</span> Bot Monitor
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/bots' %}active{% endif %}" href="/bots">Bots</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/logs' %}active{% endif %}" href="/logs">Logs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/alerts' %}active{% endif %}" href="/alerts">Alerts</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <select class="form-select form-select-sm me-2" id="timeRangeSelector">
+                        <option value="1h">Last Hour</option>
+                        <option value="6h">Last 6 Hours</option>
+                        <option value="24h" selected>Last 24 Hours</option>
+                        <option value="7d">Last 7 Days</option>
+                        <option value="30d">Last 30 Days</option>
+                    </select>
+                    <select class="form-select form-select-sm" id="botSelector">
+                        <option value="all" selected>All Bots</option>
+                        <!-- Bot options will be populated dynamically -->
+                    </select>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    
+    <!-- Chart.js -->
+    <script src="{{ url_for('static', filename='js/chart.min.js') }}"></script>
+    
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    
+    <!-- Common JS -->
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    
+    <!-- macOS Effects JS -->
+    <script src="{{ url_for('static', filename='js/macos-effects.js') }}"></script>
+    
+    <!-- Additional JS -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

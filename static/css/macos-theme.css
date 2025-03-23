@@ -1,0 +1,223 @@
+/* macOS-inspired Design System for Telegram Bot Dashboard */
+
+:root {
+  /* Base Colors */
+  --primary-bg: #1c1c1e;
+  --secondary-bg: #2c2c2e;
+  --card-bg: rgba(44, 44, 46, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --header-text: #ffffff;
+  
+  /* Accent Colors */
+  --accent-blue: #0a84ff;
+  --accent-teal: #64d2ff;
+  --accent-cyan: #5ac8fa;
+  --danger: #ff453a;
+  --warning: #ff9f0a;
+  --success: #30d158;
+  --info: #5ac8fa;
+  
+  /* Shadows and Effects */
+  --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  --hover-shadow: 0 14px 28px rgba(0, 0, 0, 0.25);
+  --button-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  
+  /* Rounded Corners */
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* Global Styles */
+body {
+  background-color: var(--primary-bg);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.6;
+  transition: background-color var(--transition-normal);
+}
+
+/* Navbar */
+.navbar {
+  background-color: rgba(28, 28, 30, 0.8) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-bottom: none;
+}
+
+.navbar-brand {
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+/* Cards */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all var(--transition-normal);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--hover-shadow);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.card-header {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  color: var(--header-text);
+  padding: 1rem 1.25rem;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6, .bento-item-title {
+  color: var(--header-text);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+/* Tables */
+.table {
+  color: var(--text-primary);
+}
+
+.table thead th {
+  border-bottom: 1px solid var(--border-color);
+  background-color: rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+  color: var(--header-text);
+}
+
+.table td, .table th {
+  border-color: var(--border-color);
+  padding: 0.75rem 1rem;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Form Controls */
+.form-control, .form-select {
+  background-color: rgba(44, 44, 46, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  transition: all var(--transition-fast);
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: rgba(44, 44, 46, 0.7);
+  border-color: var(--accent-blue);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
+}
+
+/* Buttons */
+.btn {
+  border-radius: var(--border-radius-md);
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.btn-primary {
+  background-color: var(--accent-blue);
+  border-color: var(--accent-blue);
+  box-shadow: var(--button-shadow);
+}
+
+.btn-primary:hover {
+  background-color: #0071e3;
+  border-color: #0071e3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.btn-outline-secondary {
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-outline-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Status Indicators */
+.status-active {
+  color: var(--success);
+}
+
+.status-inactive {
+  color: var(--text-secondary);
+}
+
+.status-error {
+  color: var(--danger);
+}
+
+/* Severity Indicators */
+.severity-low {
+  color: var(--info);
+}
+
+.severity-medium {
+  color: var(--warning);
+}
+
+.severity-high {
+  color: var(--danger);
+}
+
+.severity-critical {
+  color: var(--danger);
+  font-weight: bold;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .card {
+    border-radius: var(--border-radius-md);
+  }
+  
+  .form-control, .form-select, .btn {
+    border-radius: var(--border-radius-sm);
+  }
+}
